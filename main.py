@@ -1,16 +1,20 @@
-from diffusers import DiffusionPipeline
+from diffusers import AutoPipelineForText2Image
 import os
 import time
+import torch
 
 # Create 'output' folder if it doesn't exist
 os.makedirs("output", exist_ok=True)
 
 # Load the diffusion model pipeline
-pipe = DiffusionPipeline.from_pretrained("stabilityai/sdxl-turbo").to("mps")
+pipe = AutoPipelineForText2Image.from_pretrained(
+           "stabilityai/sdxl-turbo",
+           torch_dtype=torch.float16,
+           variant="fp16").to("mps")
 
 def generate_image(prompt: str):
     # Generate the image using the diffusion pipeline
-    results = pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0.0)
+    results = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0)
     
     # Save the image and the prompt
     timestamp = time.strftime("%Y%m%d%H%M%S")
